@@ -1,0 +1,11 @@
+# Local Netlify folder
+.netlify
+node_modules
+migrations
+.env
+.env.test
+
+deno.lock
+.hintrc
+
+coverage

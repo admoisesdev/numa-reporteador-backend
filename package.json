@@ -1,0 +1,37 @@
+{
+  "name": "numa-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "netlify:dev": "netlify dev",
+    "netlify:build": "netlify build",
+    "netlify:prod": "netlify deploy --prod",
+    "drizzle:generate": "npx drizzle-kit generate",
+    "drizzle:push": "npx drizzle-kit push",
+    "drizzle:introspect": "npx drizzle-kit introspect",
+    "drizzle:studio": "npx drizzle-kit studio",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "seed": "ts-node-dev ./netlify/data/seed/seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "@netlify/functions": "^3.0.0",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.3",
+    "env-var": "^7.5.0",
+    "ws": "^8.18.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/ws": "^8.5.14",
+    "drizzle-kit": "^0.30.4",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.7.3"
+  }
+}
