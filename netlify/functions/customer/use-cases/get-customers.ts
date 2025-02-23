@@ -7,7 +7,7 @@ import { HEADERS } from "../../../config/constants";
 import { customersTable } from "../../../data/schemas";
 
 type GetCustomersParams = {
-  onlyActive?: boolean;
+  onlyActives?: boolean;
 };
 
 interface GetCustomersUseCase {
@@ -20,12 +20,15 @@ export class GetCustomers implements GetCustomersUseCase {
   ) {}
 
   public async execute(params?: GetCustomersParams): Promise<HandlerResponse> {
-    const { onlyActive = false } = params || {};
+    const { onlyActives = false } = params || {};
 
     try {
-      if (onlyActive) {
-        const activesCustomers = await this.customerService.findOne(customersTable.activo, onlyActive);
-       
+      if (onlyActives) {
+        const activesCustomers = await this.customerService.findOne(
+          customersTable.activo,
+          onlyActives
+        );
+
         return {
           statusCode: 200,
           body: JSON.stringify(activesCustomers),

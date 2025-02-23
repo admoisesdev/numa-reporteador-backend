@@ -5,7 +5,6 @@ import { HEADERS } from "../../config/constants";
 
 const handler: Handler = async (event: HandlerEvent) => {
   const { httpMethod, path,queryStringParameters } = event;
-  
 
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -16,10 +15,10 @@ const handler: Handler = async (event: HandlerEvent) => {
 
   if (httpMethod === "GET" && path.includes("/customer")) {
     if (queryStringParameters) {
-      const { active } = queryStringParameters;
+      const onlyActiveCustomers = queryStringParameters.active === "true";
 
       return new GetCustomers()
-        .execute({ onlyActive: Boolean(active) })
+        .execute({ onlyActives: onlyActiveCustomers })
         .then((res) => res)
         .catch((error) => error);
     }
