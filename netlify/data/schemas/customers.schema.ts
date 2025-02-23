@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar } from "drizzle-orm/pg-core";
+import { boolean, pgTable, serial, varchar } from "drizzle-orm/pg-core";
 
 export const customersTable = pgTable("clientes", {
   id: serial("id").primaryKey(),
@@ -7,6 +7,7 @@ export const customersTable = pgTable("clientes", {
   proyecto: varchar("proyecto", { length: 100 }),
   telefono: varchar("telefono", { length: 20 }),
   email: varchar("email", { length: 255 }),
+  activo: boolean("activo").notNull().default(true),
 });
 
 export type InsertCustomers = typeof customersTable.$inferInsert;

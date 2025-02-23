@@ -8,6 +8,7 @@
     "netlify:prod": "netlify deploy --prod",
     "drizzle:generate": "npx drizzle-kit generate",
     "drizzle:push": "npx drizzle-kit push",
+    "drizzle:pull": "npx drizzle-kit pull",
     "drizzle:introspect": "npx drizzle-kit introspect",
     "drizzle:studio": "npx drizzle-kit studio",
     "test": "jest",

@@ -4,7 +4,8 @@ import { GetCustomers } from "./use-cases";
 import { HEADERS } from "../../config/constants";
 
 const handler: Handler = async (event: HandlerEvent) => {
-  const { httpMethod, path } = event;
+  const { httpMethod, path,queryStringParameters } = event;
+  
 
   if (event.httpMethod === "OPTIONS") {
     return {
@@ -14,6 +15,15 @@ const handler: Handler = async (event: HandlerEvent) => {
   }
 
   if (httpMethod === "GET" && path.includes("/customer")) {
+    if (queryStringParameters) {
+      const { active } = queryStringParameters;
+
+      return new GetCustomers()
+        .execute({ onlyActive: Boolean(active) })
+        .then((res) => res)
+        .catch((error) => error);
+    }
+
     return new GetCustomers()
       .execute()
       .then((res) => res)

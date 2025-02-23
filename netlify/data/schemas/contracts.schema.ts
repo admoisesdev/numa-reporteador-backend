@@ -5,7 +5,6 @@ export const contractsTable = pgTable("contratos", {
   id: varchar("id", { length: 50 }).primaryKey(),
   estado: varchar("estado", { length: 20 }),
   ubicacion: varchar("ubicacion", { length: 100 }),
-  cliente_id: integer("cliente_id").references(() => customersTable.id),
   cliente_vendedor: varchar("cliente_vendedor", { length: 100 }),
   fecha_creacion: date("fecha_creacion"),
   empresa: varchar("empresa", { length: 100 }),
@@ -28,6 +27,7 @@ export const contractsTable = pgTable("contratos", {
     precision: 5,
     scale: 2,
   }),
+  cliente_id: integer("cliente_id").references(() => customersTable.id),
 });
 
 export type InsertContracts = typeof contractsTable.$inferInsert;

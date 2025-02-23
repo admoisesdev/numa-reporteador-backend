@@ -4,9 +4,14 @@ import { CustomerService } from "../../../services";
 
 
 import { HEADERS } from "../../../config/constants";
+import { customersTable } from "../../../data/schemas";
+
+type GetCustomersParams = {
+  onlyActive?: boolean;
+};
 
 interface GetCustomersUseCase {
-  execute(token: string): Promise<HandlerResponse>;
+  execute(params?: GetCustomersParams): Promise<HandlerResponse>;
 }
 
 export class GetCustomers implements GetCustomersUseCase {
@@ -14,9 +19,23 @@ export class GetCustomers implements GetCustomersUseCase {
     private readonly customerService: CustomerService = new CustomerService()
   ) {}
 
-  public async execute(): Promise<HandlerResponse> {
+  public async execute(params?: GetCustomersParams): Promise<HandlerResponse> {
+    const { onlyActive = false } = params || {};
+
     try {
+      if (onlyActive) {
+        const activesCustomers = await this.customerService.findOne(customersTable.activo, onlyActive);
+       
+        return {
+          statusCode: 200,
+          body: JSON.stringify(activesCustomers),
+          headers: HEADERS.json,
+        };
+      }
+
+      
       const customers = await this.customerService.findAll();
+     
 
       return {
         statusCode: 200,
