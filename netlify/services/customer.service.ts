@@ -23,4 +23,30 @@ export class CustomerService {
 
     return oneRecordByFilter;
   }
+
+  /* async findContractsByCustomerId(customerId: number) {
+    const contractsByCustomer = await db
+      .select()
+      .from(contractsTable)
+      .where(eq(contractsTable.cliente_id, customerId));
+    
+    return contractsByCustomer;
+  } */
+
+  /* async getContractAccountStatus(contractId: string) {
+    const financing = await db
+      .select()
+      .from(financingTable)
+      .where(eq(financingTable.id_contrato, contractId));
+
+    const charges = await db
+      .select()
+      .from(chargesTable)
+      .where(eq(chargesTable.id_contrato, contractId));
+
+    return {
+      financing,
+      charges,
+    };
+  } */
 }
