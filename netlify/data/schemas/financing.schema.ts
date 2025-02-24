@@ -28,7 +28,7 @@ export const financingTable = pgTable("financiamiento", {
   estado_dividendo: varchar("estado_dividendo", { length: 20 }),
   valor_interes_div: decimal("valor_interes_div", { precision: 15, scale: 2 }),
   valor_saldo_div: decimal("valor_saldo_div", { precision: 15, scale: 2 }),
-  mostrar_reporte: boolean("mostrar_rep"),
+  mostrar_reporte: boolean("mostrar_reporte"),
   valor_pagado_div: decimal("valor_pagado_div", { precision: 15, scale: 2 }),
   fecha_pago_div: date("fecha_pago_div"),
 });

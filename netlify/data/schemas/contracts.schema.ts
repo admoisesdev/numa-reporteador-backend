@@ -27,6 +27,7 @@ export const contractsTable = pgTable("contratos", {
     precision: 5,
     scale: 2,
   }),
+  tipo_producto: varchar("tipo_producto", { length: 50 }),
   cliente_id: integer("cliente_id").references(() => customersTable.id),
 });
 
