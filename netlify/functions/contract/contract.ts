@@ -1,6 +1,7 @@
 import { Handler, HandlerEvent } from "@netlify/functions";
-import { HEADERS } from "../../config/constants";
+
 import { GetContractAccountStatus, GetContractsCustomer } from "./use-cases";
+import { HEADERS } from "../../config/constants";
 
 const handler: Handler = async (event: HandlerEvent) => {
   const { httpMethod, path, queryStringParameters } = event;
