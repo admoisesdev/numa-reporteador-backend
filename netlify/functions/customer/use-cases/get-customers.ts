@@ -3,15 +3,15 @@ import { HandlerResponse } from "@netlify/functions";
 import { CustomerService } from "../../../services";
 
 
-import { HEADERS } from "../../../config/constants";
 import { customersTable } from "../../../data/schemas";
+import { HEADERS } from "../../../config/constants";
 
-type GetCustomersParams = {
+type CustomersParams = {
   onlyActives?: boolean;
 };
 
 interface GetCustomersUseCase {
-  execute(params?: GetCustomersParams): Promise<HandlerResponse>;
+  execute(params?: CustomersParams): Promise<HandlerResponse>;
 }
 
 export class GetCustomers implements GetCustomersUseCase {
@@ -19,7 +19,7 @@ export class GetCustomers implements GetCustomersUseCase {
     private readonly customerService: CustomerService = new CustomerService()
   ) {}
 
-  public async execute(params?: GetCustomersParams): Promise<HandlerResponse> {
+  public async execute(params?: CustomersParams): Promise<HandlerResponse> {
     const { onlyActives = false } = params || {};
 
     try {
