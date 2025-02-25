@@ -28,6 +28,14 @@ export const contractsTable = pgTable("contratos", {
     scale: 2,
   }),
   tipo_producto: varchar("tipo_producto", { length: 50 }),
+  valor_por_vencer: decimal("valor_por_vencer", { precision: 15, scale: 2 }),
+  porcentaje_cobrado: decimal("porcentaje_cobrado", { precision: 15, scale: 2 }),
+  valor_documentos_vencidos: decimal("valor_documentos_vencidos", {
+    precision: 15,
+    scale: 2,
+  }),
+  asesor_credito: varchar("asesor_credito", { length: 100 }),
+  moneda: varchar("moneda", { length: 10 }),
   cliente_id: integer("cliente_id").references(() => customersTable.id),
 });
 
