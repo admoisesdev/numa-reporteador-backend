@@ -3,6 +3,7 @@ import { contractsTable } from "./contracts.schema";
 
 export const chargesTable = pgTable("cobros", {
   id: serial("id").primaryKey(),
+  cabecera_id: integer("cabecera_id"),
   concepto: varchar("concepto", { length: 255 }),
   cuenta_plan: varchar("cuenta_plan", { length: 50 }),
   fecha_cobro: date("fecha_cobro"),

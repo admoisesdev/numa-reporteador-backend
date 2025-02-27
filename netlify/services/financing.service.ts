@@ -13,7 +13,7 @@ export class FinancingService {
     const oneRecordByFilter = await db
       .select(fieldsToShow!)
       .from(financingTable)
-      .where(eq(field, value));
+      .where(eq(field, value))
 
     return oneRecordByFilter;
   }
