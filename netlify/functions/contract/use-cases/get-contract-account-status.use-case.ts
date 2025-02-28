@@ -36,27 +36,47 @@ export class GetContractAccountStatus
     const { contractId = "" } = params || {};
 
     try {
-      const [contract, financing,charges] = await Promise.all([
+      const [contract, financing, charges] = await Promise.all([
         this.contractService.findOne(contractsTable.id, contractId),
-        this.financingService.findOne(financingTable.id_contrato, contractId),
+        this.financingService.findOne({
+          field: financingTable.id_contrato,
+          value: contractId,
+          orderBy: [
+            {
+              field: financingTable.numero_dividendo,
+              direction: "asc",
+            },
+          ],
+        }),
         await this.chargesService.findOne({
           field: chargesTable.id_contrato,
           value: contractId,
+          orderBy: [
+            {
+              field: chargesTable.num_dividendo,
+              direction: "asc",
+            },
+            {
+              field: chargesTable.fecha_cobro,
+              direction: "asc",
+            },
+          ],
         }),
       ]);
-      
 
-      const financingWithCharges = financing.map(fin => {
-        const relatedCharges = charges.filter(
-          (charge) => charge.cabecera_id === fin.cabecera_id
-        );
+      const financingWithCharges = financing.map((fin) => {
+        const relatedCharges = charges.filter((charge) => {
+          return (
+            charge.cabecera_id === fin.cabecera_id &&
+            charge.num_dividendo === fin.numero_dividendo
+          );
+        });
+
         return {
           ...fin,
           charges: relatedCharges,
         };
       });
-
-      
 
       const accountStatusContract = {
         contract: contract.at(0),
