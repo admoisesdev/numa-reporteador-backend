@@ -41,6 +41,12 @@ export class GetContractAccountStatus
         this.financingService.findOne({
           field: financingTable.id_contrato,
           value: contractId,
+          additionalConditions: [
+            {
+              field: financingTable.estado,
+              value: "Vigente",
+            },
+          ],
           orderBy: [
             {
               field: financingTable.numero_dividendo,
@@ -68,7 +74,8 @@ export class GetContractAccountStatus
         const relatedCharges = charges.filter((charge) => {
           return (
             charge.cabecera_id === fin.cabecera_id &&
-            charge.num_dividendo === fin.numero_dividendo
+            charge.num_dividendo === fin.numero_dividendo && 
+            charge.tipo_dividendo === fin.tipo_dividendo
           );
         });
 
