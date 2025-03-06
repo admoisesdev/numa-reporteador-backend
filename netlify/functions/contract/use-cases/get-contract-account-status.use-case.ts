@@ -52,6 +52,10 @@ export class GetContractAccountStatus
               field: financingTable.numero_dividendo,
               direction: "asc",
             },
+            {
+              field: financingTable.fecha_vencimiento,
+              direction: "asc",
+            }
           ],
         }),
         await this.chargesService.findOne({
