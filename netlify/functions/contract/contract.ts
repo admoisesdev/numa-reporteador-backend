@@ -1,6 +1,10 @@
 import { Handler, HandlerEvent } from "@netlify/functions";
 
-import { GetContractAccountStatus, GetContractsCustomer } from "./use-cases";
+import {
+  GetChargedPortfolio,
+  GetContractAccountStatus,
+  GetContractsCustomer,
+} from "./use-cases";
 import { HEADERS } from "../../config/constants";
 
 const handler: Handler = async (event: HandlerEvent) => {
@@ -15,7 +19,6 @@ const handler: Handler = async (event: HandlerEvent) => {
 
   if (queryStringParameters) {
     const customerId = queryStringParameters.customerId;
-    const contractId = queryStringParameters.contractId;
 
     if (httpMethod === "GET" && path.includes("/contract") && customerId) {
       return new GetContractsCustomer()
@@ -24,9 +27,25 @@ const handler: Handler = async (event: HandlerEvent) => {
         .catch((error) => error);
     }
 
-    if (httpMethod === "GET" && path.includes("/contract/account-status") && contractId) {
+    const contractId = queryStringParameters.contractId;
+
+    if (
+      httpMethod === "GET" &&
+      path.includes("/contract/account-status") &&
+      contractId
+    ) {
       return new GetContractAccountStatus()
         .execute({ contractId })
+        .then((res) => res)
+        .catch((error) => error);
+    }
+
+    const startDate = queryStringParameters.startDate;
+    const endDate = queryStringParameters.endDate;
+
+    if (httpMethod === "GET" && path.includes("/contract/charged-portfolio")) {
+      return new GetChargedPortfolio()
+        .execute({ rangeStartDate: startDate!, rangeEndDate: endDate! })
         .then((res) => res)
         .catch((error) => error);
     }

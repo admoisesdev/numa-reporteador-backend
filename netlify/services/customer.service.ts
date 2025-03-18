@@ -23,22 +23,4 @@ export class CustomerService {
 
     return oneRecordByFilter;
   }
-
-
-  /* async getContractAccountStatus(contractId: string) {
-    const financing = await db
-      .select()
-      .from(financingTable)
-      .where(eq(financingTable.id_contrato, contractId));
-
-    const charges = await db
-      .select()
-      .from(chargesTable)
-      .where(eq(chargesTable.id_contrato, contractId));
-
-    return {
-      financing,
-      charges,
-    };
-  } */
 }
