@@ -132,7 +132,7 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
         FROM ${contractsTable}  as c
         JOIN ${financingTable} as f ON  f.id_contrato = c.id 
         JOIN ${customersTable} as l ON l.id = c.cliente_id
-        WHERE f.estado_dividendo = 'Pagada' AND f.fecha_vencimiento BETWEEN '2024-01-01' AND '2024-01-31'
+        WHERE f.estado_dividendo = 'Pagada' AND f.fecha_vencimiento BETWEEN ${rangeStartDate} AND ${rangeEndDate}
               AND c.proyecto = 'NUMA'
         GROUP BY c.id, l.nombre, vencida_menor_30_fb, vencida_mayor_30_fb, al_tiemopo_fb, prepago_fb, vencida_menor_30_ce, 
                   vencida_mayor_30_ce, al_tiemopo_ce, prepago_ce
