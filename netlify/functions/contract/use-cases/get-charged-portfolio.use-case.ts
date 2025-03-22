@@ -36,7 +36,6 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
       };
     }
 
-    // Validar que sean fechas
     const startDate = new Date(rangeStartDate);
     const endDate = new Date(rangeEndDate);
 

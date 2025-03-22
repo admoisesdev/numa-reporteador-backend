@@ -4,6 +4,7 @@ import {
   GetChargedPortfolio,
   GetContractAccountStatus,
   GetContractsCustomer,
+  GetReceivables,
 } from "./use-cases";
 import { HEADERS } from "../../config/constants";
 
@@ -46,6 +47,15 @@ const handler: Handler = async (event: HandlerEvent) => {
     if (httpMethod === "GET" && path.includes("/contract/charged-portfolio")) {
       return new GetChargedPortfolio()
         .execute({ rangeStartDate: startDate!, rangeEndDate: endDate! })
+        .then((res) => res)
+        .catch((error) => error);
+    }
+
+    const expirationDate = queryStringParameters.expirationDate;
+
+    if (httpMethod === "GET" && path.includes("/contract/receivables")) {
+      return new GetReceivables()
+        .execute({ expirationDate: expirationDate! })
         .then((res) => res)
         .catch((error) => error);
     }
