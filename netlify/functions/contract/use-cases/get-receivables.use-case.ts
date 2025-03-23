@@ -73,7 +73,7 @@ export class GetReceivables implements GetReceivablesUseCase {
         JOIN ${financingTable} AS f ON  f.id_contrato = c.id 
         JOIN ${customersTable} AS l ON l.id = c.cliente_id
         WHERE f.estado_dividendo = 'Vigente' AND  f.fecha_vencimiento <= ${expirationDate}
-        ORDER by contrato
+        ORDER by contrato, f.fecha_vencimiento
       `);
 
       return {
