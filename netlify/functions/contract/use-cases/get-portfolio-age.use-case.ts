@@ -81,32 +81,32 @@ export class GetPortfolioAge implements GetPortfolioAgeUseCase {
         c.precioventa,
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id AND estado_dividendo = 'Pagada'), 0) AS total_cobrado,
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento <= '2024-03-31'), 0) AS Saldo_entrada,
+          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento <= ${expirationDate}), 0) AS Saldo_entrada,
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Financiamiento Bancario' AND fecha_vencimiento <= '2024-03-31'), 0) AS h_tramite,
+          tipo_dividendo = 'Financiamiento Bancario' AND fecha_vencimiento <= ${expirationDate}), 0) AS h_tramite,
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Financiamiento Directo' AND fecha_vencimiento <= '2024-03-31'), 0) AS f_directo,
+          tipo_dividendo = 'Financiamiento Directo' AND fecha_vencimiento <= ${expirationDate}), 0) AS f_directo,
 
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento >= (CAST('2024-03-31' AS DATE)- INTERVAL '1 month') 
-        AND fecha_vencimiento <= '2024-03-31'), 0) AS de_0_30,
+          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento >= (CAST(${expirationDate} AS DATE)- INTERVAL '1 month') 
+        AND fecha_vencimiento <= ${expirationDate}), 0) AS de_0_30,
 
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento >= (CAST('2024-03-31' AS DATE)- INTERVAL '2 month') 
-        AND fecha_vencimiento <=  (CAST('2024-03-31' AS DATE)- INTERVAL '1 month')), 0) AS de_30_60,
+          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento >= (CAST(${expirationDate} AS DATE)- INTERVAL '2 month') 
+        AND fecha_vencimiento <=  (CAST(${expirationDate} AS DATE)- INTERVAL '1 month')), 0) AS de_30_60,
 
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento >= (CAST('2024-03-31' AS DATE)- INTERVAL '3 month') 
-        AND fecha_vencimiento <=  (CAST('2024-03-31' AS DATE)- INTERVAL '2 month')), 0) AS de_60_90,
+          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento >= (CAST(${expirationDate} AS DATE)- INTERVAL '3 month') 
+        AND fecha_vencimiento <=  (CAST(${expirationDate} AS DATE)- INTERVAL '2 month')), 0) AS de_60_90,
         
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento <= (CAST('2024-03-31' AS DATE)- INTERVAL '3 month')), 0) AS mayor_90
+          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento <= (CAST(${expirationDate} AS DATE)- INTERVAL '3 month')), 0) AS mayor_90
 
 
         FROM ${contractsTable}  AS c
         JOIN ${financingTable} AS f ON  f.id_contrato = c.id 
         JOIN ${customersTable} AS l ON l.id = c.cliente_id
-        WHERE f.estado_dividendo = 'Vigente' AND  f.fecha_vencimiento <= '2024-03-31'
+        WHERE f.estado_dividendo = 'Vigente' AND  f.fecha_vencimiento <= ${expirationDate}
 
         ORDER by contrato
         )
