@@ -112,8 +112,6 @@ export class GetPortfolioAge implements GetPortfolioAgeUseCase {
         )
       `);
 
-      console.log({ lenght: portfolioAgeContracts.rows.length });
-
       return {
         statusCode: 200,
         body: JSON.stringify(portfolioAgeContracts.rows),
