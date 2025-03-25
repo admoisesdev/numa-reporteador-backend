@@ -4,6 +4,7 @@ import {
   GetChargedPortfolio,
   GetContractAccountStatus,
   GetContractsCustomer,
+  GetPortfolioAge,
   GetReceivables,
 } from "./use-cases";
 import { HEADERS } from "../../config/constants";
@@ -55,6 +56,13 @@ const handler: Handler = async (event: HandlerEvent) => {
 
     if (httpMethod === "GET" && path.includes("/contract/receivables")) {
       return new GetReceivables()
+        .execute({ expirationDate: expirationDate! })
+        .then((res) => res)
+        .catch((error) => error);
+    }
+
+    if (httpMethod === "GET" && path.includes("/contract/portfolio-age")) {
+      return new GetPortfolioAge()
         .execute({ expirationDate: expirationDate! })
         .then((res) => res)
         .catch((error) => error);
