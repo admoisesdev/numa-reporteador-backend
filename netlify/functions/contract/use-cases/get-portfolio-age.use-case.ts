@@ -107,10 +107,12 @@ export class GetPortfolioAge implements GetPortfolioAgeUseCase {
         JOIN ${financingTable} AS f ON  f.id_contrato = c.id 
         JOIN ${customersTable} AS l ON l.id = c.cliente_id
         WHERE f.estado_dividendo = 'Vigente' AND  f.fecha_vencimiento <= ${expirationDate}
-
-        ORDER by contrato
+        GROUP BY c.proyecto, c.id, c.ubicacion, l.nombre
+        ORDER BY contrato
         )
       `);
+
+      console.log({ lenght: portfolioAgeContracts.rows.length });
 
       return {
         statusCode: 200,
