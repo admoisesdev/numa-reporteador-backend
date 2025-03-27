@@ -92,7 +92,8 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
         l.nombre as cliente,
         (select max(fecha_vencimiento) FROM ${financingTable} WHERE id_contrato = c.id) as fecha_entrega,
         COALESCE((select valor_dividendos FROM ${financingTable} 
-          WHERE  tipo_dividendo = 'Cuota Inicial' AND id_contrato = c.id AND estado_dividendo = 'Pagada'), 0) as cuota_inicial,
+          WHERE  tipo_dividendo = 'Cuota Inicial' AND id_contrato = c.id AND estado_dividendo = 'Pagada'
+          AND fecha_vencimiento BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as cuota_inicial,
           
         COALESCE((select sum(case WHEN r.fecha_cobro <= date_add(f.fecha_vencimiento, '30 days') AND 
           r.fecha_cobro >= f.fecha_vencimiento THEN r.valor_cobrado ELSE 0 end) as valor
@@ -137,6 +138,8 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
                   vencida_mayor_30_ce, al_tiemopo_ce, prepago_ce
         ORDER BY c.id)
       `);
+
+      console.log({length: chargedPortfolioContracts.rows.length});
 
 
       return {
