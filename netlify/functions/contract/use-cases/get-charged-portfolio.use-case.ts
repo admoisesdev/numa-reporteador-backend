@@ -81,66 +81,73 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
         (vencida_menor_30_ce + vencida_mayor_30_ce + al_tiemopo_ce + prepago_ce) as total_cobradoce,
         (vencida_menor_30_fb + vencida_mayor_30_fb + al_tiemopo_fb + prepago_fb + vencida_menor_30_ce 
         + vencida_mayor_30_ce + al_tiemopo_ce + prepago_ce) as total
-
-
-        FROM
-        (select 
+        from
+        (
+        select 
         c.proyecto,
         c.id as contrato,
         c.asesor_credito  as oficial_credito,
         c.ubicacion as ubicacion,
-        l.nombre as cliente,
-        (select max(fecha_vencimiento) FROM ${financingTable} WHERE id_contrato = c.id) as fecha_entrega,
-        COALESCE((select valor_dividendos FROM ${financingTable} 
-          WHERE  tipo_dividendo = 'Cuota Inicial' AND id_contrato = c.id AND estado_dividendo = 'Pagada'
-          AND fecha_vencimiento BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as cuota_inicial,
+        (select distinct nombre from ${customersTable}  where id = c.cliente_id) as cliente,
+        (select max(fecha_vencimiento) from ${financingTable} where id_contrato = c.id) as fecha_entrega,
+        
+        COALESCE((select valor_dividendos from ${financingTable} 
+          where  tipo_dividendo = 'Cuota Inicial' and id_contrato = c.id and estado_dividendo = 'Pagada' and
+          fecha_vencimiento BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as cuota_inicial,
+
+        COALESCE((select sum(case when r.fecha_cobro <= date_add(n.fecha_vencimiento, '30 days') and 
+          r.fecha_cobro >= n.fecha_vencimiento then r.valor_cobrado else 0 end) as valor  from ${chargesTable} as r 
+          inner join ${financingTable} as n on  n.id_contrato = r.id_contrato and n.numero_dividendo = r.num_dividendo
+          where  r.id_contrato = c.id and r.tipo_dividendo = 'Financiamiento Bancario' and 
+          r.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as vencida_menor_30_fb,
           
-        COALESCE((select sum(case WHEN r.fecha_cobro <= date_add(f.fecha_vencimiento, '30 days') AND 
-          r.fecha_cobro >= f.fecha_vencimiento THEN r.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as r WHERE  r.id_contrato = c.id AND r.tipo_dividendo = 'Financiamiento Bancario' AND 
-          r.num_dividendo = f.numero_dividendo), 0) as vencida_menor_30_fb,
-
-        COALESCE((select sum(case WHEN s.fecha_cobro >  date_add(f.fecha_vencimiento, '30 days') THEN s.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as s WHERE  s.id_contrato = c.id AND s.tipo_dividendo = 'Financiamiento Bancario' AND 
-          s.num_dividendo = f.numero_dividendo), 0) as vencida_mayor_30_fb,
+        COALESCE((select sum(case when s.fecha_cobro >  date_add(n.fecha_vencimiento, '30 days') then s.valor_cobrado else 0 end) 
+          as valor  from ${chargesTable} as s inner join ${financingTable} as n on  n.id_contrato = s.id_contrato and n.numero_dividendo = s.num_dividendo and n.tipo_dividendo = 'Financiamiento Bancario'
+          where  s.id_contrato = c.id and s.tipo_dividendo = 'Financiamiento Bancario' and 
+          s.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as vencida_mayor_30_fb,
           
-        COALESCE((select sum(case WHEN s.fecha_cobro = f.fecha_vencimiento THEN s.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as s WHERE  s.id_contrato = c.id AND s.tipo_dividendo = 'Financiamiento Bancario' AND 
-          s.num_dividendo = f.numero_dividendo), 0) as al_tiemopo_fb,
+          COALESCE((select sum(case when s.fecha_cobro = n.fecha_vencimiento then s.valor_cobrado else 0 end) as valor
+          from ${chargesTable} as s inner join ${financingTable} as n on  n.id_contrato = s.id_contrato and n.numero_dividendo = s.num_dividendo and n.tipo_dividendo = 'Financiamiento Bancario'
+          where  s.id_contrato = c.id and s.tipo_dividendo = 'Financiamiento Bancario' and 
+          s.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as al_tiemopo_fb,
 
-        COALESCE((select sum(case WHEN t.fecha_cobro < f.fecha_vencimiento THEN t.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as t WHERE  t.id_contrato = c.id AND t.tipo_dividendo = 'Financiamiento Bancario' AND 
-          t.num_dividendo = f.numero_dividendo), 0) as prepago_fb,
+        COALESCE((select sum(case when t.fecha_cobro < n.fecha_vencimiento then t.valor_cobrado else 0 end) as valor
+          from ${chargesTable} as t inner join ${financingTable} as n on  n.id_contrato = t.id_contrato and n.numero_dividendo = t.num_dividendo and n.tipo_dividendo = 'Financiamiento Bancario'
+          where  t.id_contrato = c.id and t.tipo_dividendo = 'Financiamiento Bancario' and 
+          t.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as prepago_fb,
 
-        COALESCE((select sum(case WHEN r.fecha_cobro <= date_add(f.fecha_vencimiento, '30 days') AND 
-        r.fecha_cobro >= f.fecha_vencimiento THEN r.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as r WHERE  r.id_contrato = c.id AND r.tipo_dividendo = 'Cuota de Entrada' AND 
-          r.num_dividendo = f.numero_dividendo), 0) as vencida_menor_30_ce,
+        COALESCE((select sum(case when r.fecha_cobro <= date_add(n.fecha_vencimiento, '30 days') and 
+        r.fecha_cobro >= n.fecha_vencimiento then r.valor_cobrado else 0 end) as valor
+          from ${chargesTable} as r inner join ${financingTable} as n on  n.id_contrato = r.id_contrato and n.numero_dividendo = r.num_dividendo
+          where  r.id_contrato = c.id and r.tipo_dividendo = 'Cuota de Entrada' and 
+          r.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as vencida_menor_30_ce,
 
-        COALESCE((select sum(case WHEN s.fecha_cobro >  date_add(f.fecha_vencimiento, '30 days') THEN s.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as s WHERE  s.id_contrato = c.id AND s.tipo_dividendo = 'Cuota de Entrada' AND 
-          s.num_dividendo = f.numero_dividendo), 0) as vencida_mayor_30_ce,
+        COALESCE((select sum(case when s.fecha_cobro >  date_add(n.fecha_vencimiento, '30 days') then s.valor_cobrado else 0 end) as valor
+          from ${chargesTable} as s inner join ${financingTable} as n on  n.id_contrato = s.id_contrato and n.numero_dividendo = s.num_dividendo and n.tipo_dividendo = 'Cuota de Entrada'
+          where  s.id_contrato = c.id and s.tipo_dividendo = 'Cuota de Entrada' and 
+          s.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as vencida_mayor_30_ce,
           
-        COALESCE((select sum(case WHEN s.fecha_cobro = f.fecha_vencimiento THEN s.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as s WHERE  s.id_contrato = c.id AND s.tipo_dividendo = 'Cuota de Entrada' AND 
-          s.num_dividendo = f.numero_dividendo), 0) as al_tiemopo_ce,
+        COALESCE((select sum(case when s.fecha_cobro = n.fecha_vencimiento then s.valor_cobrado else 0 end) as valor
+          from ${chargesTable} as s inner join ${financingTable} as n on  n.id_contrato = s.id_contrato and n.numero_dividendo = s.num_dividendo and n.tipo_dividendo = 'Cuota de Entrada'
+          where  s.id_contrato = c.id and s.tipo_dividendo = 'Cuota de Entrada' and 
+          s.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as al_tiemopo_ce,
 
-        COALESCE((select sum(case WHEN t.fecha_cobro < f.fecha_vencimiento THEN t.valor_cobrado ELSE 0 end) as valor
-          FROM ${chargesTable} as t WHERE  t.id_contrato = c.id AND t.tipo_dividendo = 'Cuota de Entrada' AND 
-          t.num_dividendo = f.numero_dividendo), 0) as prepago_ce
-
-        FROM ${contractsTable}  as c
-        JOIN ${financingTable} as f ON  f.id_contrato = c.id 
-        JOIN ${customersTable} as l ON l.id = c.cliente_id
-        WHERE f.estado_dividendo = 'Pagada' AND f.fecha_vencimiento BETWEEN ${rangeStartDate} AND ${rangeEndDate}
-              AND c.proyecto = 'NUMA'
-        GROUP BY c.id, l.nombre, vencida_menor_30_fb, vencida_mayor_30_fb, al_tiemopo_fb, prepago_fb, vencida_menor_30_ce, 
-                  vencida_mayor_30_ce, al_tiemopo_ce, prepago_ce
-        ORDER BY c.id)
+        COALESCE((select sum(case when t.fecha_cobro < n.fecha_vencimiento then t.valor_cobrado else 0 end) as valor
+          from ${chargesTable} as t inner join ${financingTable} as n on  n.id_contrato = t.id_contrato and n.numero_dividendo = t.num_dividendo and n.tipo_dividendo = 'Cuota de Entrada'
+          where  t.id_contrato = c.id and t.tipo_dividendo = 'Cuota de Entrada' and 
+          t.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}), 0) as prepago_ce
+          
+          
+        from ${contractsTable}  as c
+        join ${financingTable} as f on  f.id_contrato = c.id 
+        join ${chargesTable} as b on b.id_contrato = c.id
+        where f.estado_dividendo = 'Pagada' and b.fecha_cobro BETWEEN ${rangeStartDate} AND ${rangeEndDate}
+              and c.proyecto = 'NUMA'
+        group by c.id, vencida_menor_30_fb, vencida_mayor_30_fb, al_tiemopo_fb, prepago_fb, vencida_menor_30_ce, 
+                  vencida_mayor_30_ce, al_tiemopo_ce, prepago_ce 
+        order by c.id
+        )
       `);
-
-      console.log({length: chargedPortfolioContracts.rows.length});
-
 
       return {
         statusCode: 200,
