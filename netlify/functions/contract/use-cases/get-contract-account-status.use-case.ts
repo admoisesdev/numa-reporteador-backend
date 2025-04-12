@@ -74,6 +74,13 @@ export class GetContractAccountStatus
         }),
       ]);
 
+      if (contract.length > 0) {
+        const contractData = contract.at(0)!;
+        const reserveValue = Number(contractData.valor_reserva);
+        const entryFeeBalance = Number(contractData.saldo_ce);
+        contractData.valor_entrada = String(reserveValue + entryFeeBalance);
+      }
+
       const financingWithCharges = financing.map((fin) => {
         const relatedCharges = charges.filter((charge) => {
           return (

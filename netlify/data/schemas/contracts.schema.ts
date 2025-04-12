@@ -31,7 +31,6 @@ export const contractsTable = pgTable("contratos", {
   valor_canc_pago_exced: decimal("valor_canc_pago_exced", { precision: 15, scale: 2 }),
   valor_contrato: decimal("valor_contrato", { precision: 15, scale: 2 }),
   valor_documentos_vencidos: decimal("valor_documentos_vencidos", {precision: 15,scale: 2,}),
-  valor_entrada: decimal("valor_entrada", { precision: 15, scale: 2 }),
   valor_nc: decimal("valor_nc", { precision: 15, scale: 2 }),
   valor_neto_cancel: decimal("valor_neto_cancel", { precision: 15, scale: 2 }),
   valor_por_vencer: decimal("valor_por_vencer", { precision: 15, scale: 2 }),
