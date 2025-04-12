@@ -27,7 +27,6 @@ export const financingTable = pgTable("financiamiento", {
   valor_interes_div: decimal("valor_interes_div", { precision: 15, scale: 2 }),
   valor_mora: decimal("valor_mora", { precision: 15, scale: 2 }),
   valor_pagado_div: decimal("valor_pagado_div", { precision: 15, scale: 2 }),
-  valor_saldo_div: decimal("valor_saldo_div", { precision: 15, scale: 2 }),
   id_contrato: varchar("id_contrato", { length: 50 }).references(
     () => contractsTable.id
   ),

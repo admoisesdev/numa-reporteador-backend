@@ -80,6 +80,7 @@ export class GetContractAccountStatus
         const entryFeeBalance = Number(contractData.saldo_ce);
         contractData.valor_entrada = String(reserveValue + entryFeeBalance);
       }
+      
 
       const financingWithCharges = financing.map((fin) => {
         const relatedCharges = charges.filter((charge) => {
@@ -90,9 +91,18 @@ export class GetContractAccountStatus
           );
         });
 
+         const totalChardedValue = relatedCharges.reduce(
+           (sum, charge) => sum + Number(charge.valor_cobrado || 0),
+           0
+        );
+        
+        const dividendBalanceValue =
+          Number(contract[0].valor_reserva) - totalChardedValue;
+
         return {
           ...fin,
           charges: relatedCharges,
+          valor_saldo_div: String(dividendBalanceValue),
         };
       });
 
