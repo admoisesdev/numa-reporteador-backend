@@ -127,6 +127,7 @@ export class GetContractAccountStatus
           .reduce((sum, fin) => sum + Number(fin.valor_dividendos || 0), 0);
 
         contractData.valor_entrada = String(reserveValue + entryFeeBalance);
+        
         contractData.valor_por_vencer = String(valueToBeat);
         contractData.porcentaje_cobrado = String(percentageCharged);
         contractData.valor_documentos_vencidos = String(expiredDocumentsValue);
@@ -138,6 +139,9 @@ export class GetContractAccountStatus
       
 
       const financingWithCharges = financing.map((fin) => {
+        const contractData = contract.at(0)!;
+        const reserveValue = Number(contractData.valor_reserva);
+
         const relatedCharges = charges.filter((charge) => {
           return (
             charge.cabecera_id === fin.cabecera_id &&
@@ -151,13 +155,16 @@ export class GetContractAccountStatus
            0
         );
         
-        const dividendBalanceValue =
-          Number(contract[0].valor_reserva) - totalChardedValue;
+        const initialDividendBalanceValue = reserveValue - totalChardedValue;
+        const dividendBalanceValue = fin.valor_dividendos - totalChardedValue;
 
         return {
           ...fin,
           charges: relatedCharges,
-          valor_saldo_div: String(dividendBalanceValue),
+          valor_saldo_div:
+            fin.tipo_dividendo === "Cuota Inicial"
+              ? String(initialDividendBalanceValue)
+              : String(dividendBalanceValue),
         };
       });
 
