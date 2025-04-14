@@ -15,6 +15,10 @@ import { HEADERS } from "../../../config/constants";
 
 import { isAfter, isBefore, isEqual } from "date-fns";
 
+type Financing = {
+  [x: string]: any;
+};
+
 type ContractAccountStatusParams = {
   contractId?: string;
 };
@@ -31,6 +35,9 @@ export class GetContractAccountStatus
     private readonly financingService: FinancingService = new FinancingService(),
     private readonly chargesService: ChargesService = new ChargesService()
   ) {}
+
+  private totalFinancingDividens = (sum: number, fin: Financing) =>
+    sum + Number(fin.valor_dividendos || 0);
 
   public async execute(
     params?: ContractAccountStatusParams
@@ -57,7 +64,7 @@ export class GetContractAccountStatus
             {
               field: financingTable.fecha_vencimiento,
               direction: "asc",
-            }
+            },
           ],
         }),
         await this.chargesService.findOne({
@@ -84,30 +91,41 @@ export class GetContractAccountStatus
 
         const now = new Date();
 
-        const valueToBeat = financing
+        const financingWithoutCharges = financing.filter(
+          (fin) =>
+            !charges.some(
+              (charge) =>
+                charge.cabecera_id === fin.cabecera_id &&
+                charge.num_dividendo === fin.numero_dividendo &&
+                charge.tipo_dividendo === fin.tipo_dividendo
+            )
+        );
+
+        const financingWithCharges = financing.filter((fin) =>
+          charges.some(
+            (charge) =>
+              charge.cabecera_id === fin.cabecera_id &&
+              charge.num_dividendo === fin.numero_dividendo &&
+              charge.tipo_dividendo === fin.tipo_dividendo
+          )
+        );
+
+        const valueToBeat = financingWithoutCharges
           .filter(
             (fin) =>
-              !charges.some((charge) => charge.cabecera_id === fin.cabecera_id) &&
-              isAfter(new Date(fin.fecha_vencimiento), now)
+              isAfter(new Date(fin.fecha_vencimiento), now) ||
+              isEqual(new Date(fin.fecha_vencimiento), now)
           )
-          .reduce((sum, fin) => sum + Number(fin.valor_dividendos || 0), 0);
+          .reduce(this.totalFinancingDividens, 0);
 
         const percentageCharged =
-          (financing.reduce(
-            (sum, fin) => sum + Number(fin.valor_dividendos || 0),
-            0
-          ) /
+          (financingWithCharges.reduce(this.totalFinancingDividens, 0) /
             salePrice) *
           100;
 
-        const expiredDocumentsValue = financing
-          .filter(
-            (fin) =>
-              charges.some((charge) => charge.cabecera_id === fin.cabecera_id) &&
-              (isBefore(new Date(fin.fecha_vencimiento), now) ||
-                isEqual(new Date(fin.fecha_vencimiento), now))
-          )
-          .reduce((sum, fin) => sum + Number(fin.valor_dividendos || 0), 0);
+        const expiredDocumentsValue = financingWithoutCharges
+          .filter((fin) => isBefore(new Date(fin.fecha_vencimiento), now))
+          .reduce(this.totalFinancingDividens, 0);
 
         const totalExpired =
           expiredDocumentsValue +
@@ -124,10 +142,10 @@ export class GetContractAccountStatus
 
         const totalValueChargedCustomer = financing
           .filter((fin) => fin.estado_dividendo === "Vigente")
-          .reduce((sum, fin) => sum + Number(fin.valor_dividendos || 0), 0);
+          .reduce(this.totalFinancingDividens, 0);
 
         contractData.valor_entrada = String(reserveValue + entryFeeBalance);
-        
+
         contractData.valor_por_vencer = String(valueToBeat);
         contractData.porcentaje_cobrado = String(percentageCharged);
         contractData.valor_documentos_vencidos = String(expiredDocumentsValue);
@@ -136,7 +154,6 @@ export class GetContractAccountStatus
         contractData.valor_neto_cancel = String(netValueCancel);
         contractData.valor_total_cob_client = String(totalValueChargedCustomer);
       }
-      
 
       const financingWithCharges = financing.map((fin) => {
         const contractData = contract.at(0)!;
@@ -145,16 +162,16 @@ export class GetContractAccountStatus
         const relatedCharges = charges.filter((charge) => {
           return (
             charge.cabecera_id === fin.cabecera_id &&
-            charge.num_dividendo === fin.numero_dividendo && 
+            charge.num_dividendo === fin.numero_dividendo &&
             charge.tipo_dividendo === fin.tipo_dividendo
           );
         });
 
-         const totalChardedValue = relatedCharges.reduce(
-           (sum, charge) => sum + Number(charge.valor_cobrado || 0),
-           0
+        const totalChardedValue = relatedCharges.reduce(
+          (sum, charge) => sum + Number(charge.valor_cobrado || 0),
+          0
         );
-        
+
         const initialDividendBalanceValue = reserveValue - totalChardedValue;
         const dividendBalanceValue = fin.valor_dividendos - totalChardedValue;
 
