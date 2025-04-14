@@ -80,10 +80,13 @@ export class GetPortfolioAge implements GetPortfolioAgeUseCase {
         (SELECT MAX(fecha_vencimiento) FROM ${financingTable} WHERE id_contrato = c.id) AS fecha_entrega,
         c.precioventa,
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id AND estado_dividendo = 'Pagada'), 0) AS total_cobrado,
+        
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
-          tipo_dividendo = 'Cuota de Entrada' AND fecha_vencimiento <= ${expirationDate}), 0) AS Saldo_entrada,
+          tipo_dividendo = 'Cuota de Entrada'), 0) AS Saldo_entrada,
+
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
           tipo_dividendo = 'Financiamiento Bancario' AND fecha_vencimiento <= ${expirationDate}), 0) AS h_tramite,
+
         COALESCE((SELECT SUM(valor_dividendos) FROM ${financingTable} WHERE id_contrato = c.id  AND estado_dividendo = 'Vigente' AND
           tipo_dividendo = 'Financiamiento Directo' AND fecha_vencimiento <= ${expirationDate}), 0) AS f_directo,
 
@@ -111,6 +114,7 @@ export class GetPortfolioAge implements GetPortfolioAgeUseCase {
         ORDER BY contrato
         )
       `);
+
 
       return {
         statusCode: 200,
