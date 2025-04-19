@@ -18,11 +18,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL,
-      'http://localhost:5173',
-      '34.71.107.222',
-    ],
+    origin: [process.env.FRONTEND_URL, 'http://localhost:5173'],
   });
 
   const config = new DocumentBuilder()

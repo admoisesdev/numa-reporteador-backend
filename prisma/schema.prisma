@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model clientes {
+  id             Int         @id @default(autoincrement())
+  identificacion String      @db.VarChar(20)
+  nombre         String      @db.VarChar(255)
+  proyecto       String?     @db.VarChar(100)
+  telefono       String?     @db.VarChar(20)
+  email          String?     @db.VarChar(255)
+  activo         Boolean     @default(true)
+  contratos      contratos[]
+}
+
+model cobros {
+  id               Int        @id @default(autoincrement())
+  id_contrato      String?    @db.VarChar(50)
+  valor_cobrado    Decimal?   @db.Decimal(15, 2)
+  num_dividendo    Int?
+  tipo_dividendo   String?    @db.VarChar(50)
+  tipo_transaccion String?    @db.VarChar(50)
+  fecha_cobro      DateTime?  @db.Date
+  fecha_vcto_cobro DateTime?  @db.Date
+  concepto         String?    @db.VarChar(255)
+  tipo_comprobante String?    @db.VarChar(50)
+  id_transaccion   Int?
+  referencia       String?    @db.VarChar(50)
+  nro_documento    String?    @db.VarChar(50)
+  cuenta_plan      String?    @db.VarChar(50)
+  nombre_cuenta    String?    @db.VarChar(100)
+  recibo_num       String?    @db.VarChar(50)
+  cabecera_id      Int?
+  contratos        contratos? @relation(fields: [id_contrato], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cobros_id_contrato_contratos_id_fk")
+}
+
+model contratos {
+  id                        String           @id @db.VarChar(50)
+  estado                    String?          @db.VarChar(20)
+  ubicacion                 String?          @db.VarChar(100)
+  cliente_id                Int?
+  cliente_vendedor          String?          @db.VarChar(100)
+  fecha_creacion            DateTime?        @db.Date
+  empresa                   String?          @db.VarChar(100)
+  proyecto                  String?          @db.VarChar(100)
+  precio_lista              Decimal?         @db.Decimal(15, 2)
+  descuento                 Decimal?         @db.Decimal(15, 2)
+  precioventa               Decimal?         @db.Decimal(15, 2)
+  fecha_reserva             DateTime?        @db.Date
+  fecha_cierre              DateTime?        @db.Date
+  financiamiento_idvigente  Int?
+  tipo_contratoid           String?          @db.VarChar(50)
+  valor_contrato            Decimal?         @db.Decimal(15, 2)
+  valor_reserva             Decimal?         @db.Decimal(15, 2)
+  cuota_reserv2             Decimal?         @db.Decimal(15, 2)
+  cuota_reserv8             Decimal?         @db.Decimal(15, 2)
+  valor_saldo               Decimal?         @db.Decimal(15, 2)
+  plazo_ce                  Int?
+  cantidad_cuota_inicial    Decimal?         @db.Decimal(5, 2)
+  tipo_producto             String?          @db.VarChar(50)
+  valor_por_vencer          Decimal?         @db.Decimal(15, 2)
+  porcentaje_cobrado        Decimal?         @db.Decimal(15, 2)
+  valor_documentos_vencidos Decimal?         @db.Decimal(15, 2)
+  asesor_credito            String?          @db.VarChar(100)
+  moneda                    String?          @db.VarChar(10)
+  int_mora_pagar            Decimal?         @db.Decimal(15, 2)
+  valor_total_vencido       Decimal?         @db.Decimal(15, 2)
+  valor_nc                  Decimal?         @db.Decimal(15, 2)
+  valor_total_descuento     Decimal?         @db.Decimal(15, 2)
+  saldo_ce                  Decimal?         @db.Decimal(15, 2)
+  valor_canc_mora           Decimal?         @db.Decimal(15, 2)
+  valor_canc_pago_exced     Decimal?         @db.Decimal(15, 2)
+  valor_neto_cancel         Decimal?         @db.Decimal(15, 2)
+  valor_canc_cheq           Decimal?         @db.Decimal(15, 2)
+  valor_total_cob_client    Decimal?         @db.Decimal(15, 2)
+  cobros                    cobros[]
+  clientes                  clientes?        @relation(fields: [cliente_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "contratos_cliente_id_clientes_id_fk")
+  financiamiento            financiamiento[]
+}
+
+model financiamiento {
+  id                     Int        @id @default(autoincrement())
+  id_contrato            String?    @db.VarChar(50)
+  cabecera_id            Int?
+  cabecera_factura       Int?
+  estado                 String?    @db.VarChar(20)
+  numero_dividendo       Int?
+  tipo_dividendo         String?    @db.VarChar(50)
+  valor_dividendos       Decimal?   @db.Decimal(15, 2)
+  valor_mora             Decimal?   @db.Decimal(15, 2)
+  fecha_refinanciamiento DateTime?  @db.Date
+  total_dividendo        Int?
+  fecha_creacion         DateTime?  @db.Date
+  fecha_vencimiento      DateTime?  @db.Date
+  estado_dividendo       String?    @db.VarChar(20)
+  valor_interes_div      Decimal?   @db.Decimal(15, 2)
+  mostrar_reporte        Boolean?
+  valor_pagado_div       Decimal?   @db.Decimal(15, 2)
+  fecha_pago_div         DateTime?  @db.Date
+  contratos              contratos? @relation(fields: [id_contrato], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "financiamiento_id_contrato_contratos_id_fk")
+}
