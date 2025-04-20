@@ -5,6 +5,7 @@ import {
   GetChargedPortfolio,
   GetContractAccountStatus,
   GetContractsCustomer,
+  GetPortfolioAge,
   GetReceivables,
 } from './use-cases';
 
@@ -36,5 +37,11 @@ export class ContractService {
   async getReceivables(expirationDate: string) {
     const receivables = new GetReceivables();
     return await receivables.execute({ expirationDate });
+  }
+
+  async getPortfolioAge(expirationDate: string) {
+    const portfolioAge = new GetPortfolioAge();
+
+    return await portfolioAge.execute({ expirationDate });
   }
 }

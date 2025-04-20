@@ -29,4 +29,9 @@ export class ContractController {
   async getReceivables(@Query('expirationDate') expirationDate: string) {
     return await this.contractService.getReceivables(expirationDate);
   }
+
+  @Get('/portfolio-age')
+  async getPortfolioAge(@Query('expirationDate') expirationDate: string) {
+    return await this.contractService.getPortfolioAge(expirationDate);
+  }
 }
