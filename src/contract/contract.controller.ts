@@ -16,4 +16,12 @@ export class ContractController {
   async getContractAccountStatus(@Query('contractId') contractId: string) {
     return await this.contractService.getAccountStatus(contractId);
   }
+
+  @Get('/charged-portfolio')
+  async getChargedPortfolio(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return await this.contractService.getChargedPortfolio(startDate, endDate);
+  }
 }

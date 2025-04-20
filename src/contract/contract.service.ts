@@ -1,7 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { contratos as Contract } from '@prisma/client';
 
-import { GetContractAccountStatus, GetContractsCustomer } from './use-cases';
+import {
+  GetChargedPortfolio,
+  GetContractAccountStatus,
+  GetContractsCustomer,
+} from './use-cases';
 
 @Injectable()
 export class ContractService {
@@ -17,5 +21,14 @@ export class ContractService {
     const contractAccountStatus = new GetContractAccountStatus();
 
     return await contractAccountStatus.execute({ contractId });
+  }
+
+  async getChargedPortfolio(rangeStartDate: string, rangeEndDate: string) {
+    const chargedPortfolio = new GetChargedPortfolio();
+
+    return await chargedPortfolio.execute({
+      rangeStartDate,
+      rangeEndDate,
+    });
   }
 }
