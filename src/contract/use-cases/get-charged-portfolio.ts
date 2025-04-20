@@ -138,8 +138,6 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
         )
       `;
 
-      console.log(chargedPortfolioContracts);
-
       return chargedPortfolioContracts;
     } catch (error) {
       this.handleExceptions(error);
