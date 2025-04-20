@@ -24,4 +24,9 @@ export class ContractController {
   ) {
     return await this.contractService.getChargedPortfolio(startDate, endDate);
   }
+
+  @Get('/receivables')
+  async getReceivables(@Query('expirationDate') expirationDate: string) {
+    return await this.contractService.getReceivables(expirationDate);
+  }
 }

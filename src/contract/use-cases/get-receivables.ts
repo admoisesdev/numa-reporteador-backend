@@ -1,53 +1,49 @@
-/* import { HandlerResponse } from "@netlify/functions";
-
-import { db } from "../../../data/db";
 import {
-  contractsTable,
-  customersTable,
-  financingTable,
-} from "../../../data/schemas";
-
-import { HEADERS } from "../../../config/constants";
-
-import { sql } from "drizzle-orm";
+  BadRequestException,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
+import { PrismaService } from 'src/common';
 
 type ReceivablesParams = {
   expirationDate: string;
 };
 
 interface GetReceivablesUseCase {
-  execute(params?: ReceivablesParams): Promise<HandlerResponse>;
+  execute(params?: ReceivablesParams);
 }
 
 export class GetReceivables implements GetReceivablesUseCase {
-  public async execute(
-    params: ReceivablesParams
-  ): Promise<HandlerResponse> {
+  private readonly logger = new Logger('GetReceivables');
+
+  constructor(private readonly prisma: PrismaService = new PrismaService()) {}
+
+  private handleExceptions(error: any) {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+    this.logger.error(error);
+    throw new InternalServerErrorException(
+      'Unexpected error, check server logs',
+    );
+  }
+
+  public async execute(params: ReceivablesParams) {
     const { expirationDate: expirationDateParam } = params;
     if (!expirationDateParam) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: "Missing required parameters 'startDate' and 'endDate'",
-        }),
-        headers: HEADERS.json,
-      };
+      throw new BadRequestException(
+        "Missing required parameter 'expirationDate'",
+      );
     }
 
     const expirationDate = new Date(expirationDateParam);
 
-    if (expirationDate.toString() === "Invalid Date") {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({
-          message: "Invalid 'expirationDate' format",
-        }),
-        headers: HEADERS.json,
-      };
+    if (isNaN(expirationDate.getTime())) {
+      throw new BadRequestException("Invalid 'expirationDate' format");
     }
 
     try {
-      const receivablesContracts = await db.execute(sql`
+      const receivablesContracts = await this.prisma.$queryRaw`
         SELECT 
         c.empresa,
         c.proyecto,
@@ -69,27 +65,16 @@ export class GetReceivables implements GetReceivablesUseCase {
         f.valor_dividendos AS imp_pendiente,
         f.valor_dividendos AS imp_bruto
 
-        FROM ${contractsTable}  AS c
-        JOIN ${financingTable} AS f ON  f.id_contrato = c.id 
-        JOIN ${customersTable} AS l ON l.id = c.cliente_id
+        FROM contratos AS c
+        JOIN financiamiento AS f ON  f.id_contrato = c.id 
+        JOIN clientes AS l ON l.id = c.cliente_id
         WHERE f.estado_dividendo = 'Vigente' AND  f.fecha_vencimiento <= ${expirationDate}
         ORDER by contrato, f.fecha_vencimiento
-      `);
+      `;
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify(receivablesContracts.rows),
-        headers: HEADERS.json,
-      };
-    } catch (error: any) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({
-          message: error.message,
-        }),
-        headers: HEADERS.json,
-      };
+      return receivablesContracts;
+    } catch (error) {
+      this.handleExceptions(error);
     }
   }
 }
- */

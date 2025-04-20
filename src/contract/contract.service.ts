@@ -5,6 +5,7 @@ import {
   GetChargedPortfolio,
   GetContractAccountStatus,
   GetContractsCustomer,
+  GetReceivables,
 } from './use-cases';
 
 @Injectable()
@@ -30,5 +31,10 @@ export class ContractService {
       rangeStartDate,
       rangeEndDate,
     });
+  }
+
+  async getReceivables(expirationDate: string) {
+    const receivables = new GetReceivables();
+    return await receivables.execute({ expirationDate });
   }
 }
