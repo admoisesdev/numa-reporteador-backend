@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus } from '@nestjs/common';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { clientes as Customer } from '@prisma/client';
 
 import { PrismaService } from 'src/common';
@@ -12,17 +17,22 @@ interface GetCustomersUseCase {
 }
 
 export class GetCustomers implements GetCustomersUseCase {
+  private readonly logger = new Logger('GetCustomers');
+
   constructor(private prisma: PrismaService = new PrismaService()) {}
+
+  private handleExceptions(error: any) {
+    if (error.code === '23505') {
+      throw new BadRequestException(error.detail);
+    }
+    this.logger.error(error);
+    throw new InternalServerErrorException(
+      'Unexpected error, check server logs',
+    );
+  }
 
   public async execute(params?: CustomersParams): Promise<Customer[]> {
     const { active = false } = params;
-
-    if (!active) {
-      throw new HttpException(
-        'Only active customers are allowed',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     try {
       const activeCustomers = await this.prisma.clientes.findMany({
@@ -32,18 +42,12 @@ export class GetCustomers implements GetCustomersUseCase {
       });
 
       if (!activeCustomers || activeCustomers.length === 0) {
-        throw new HttpException(
-          'No active customers found',
-          HttpStatus.NOT_FOUND,
-        );
+        throw new NotFoundException('No active customers found');
       }
 
       return activeCustomers;
-    } catch (error: any) {
-      throw new HttpException(
-        error.message || 'Internal Server Error',
-        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+    } catch (error) {
+      this.handleExceptions(error);
     }
   }
 }
