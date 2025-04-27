@@ -10,7 +10,7 @@ RUN pnpm install --frozen-lockfile && \
     pnpm run build
 
 ENV FRONTEND_URL=http://34.71.107.222
-ENV DATABASE_URL=postgresql://postgres:admin123@34.71.107.222:5433/numadb?schema=public
+ENV DATABASE_URL=postgresql://postgres:admin123@34.71.107.222:5433/numadb?schema=public&connection_limit=20&pool_timeout=5
 ENV PORT=3000
 
 EXPOSE 3000
