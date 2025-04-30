@@ -9,9 +9,17 @@ RUN pnpm install --frozen-lockfile && \
     npx prisma generate && \
     pnpm run build
 
-ENV FRONTEND_URL=http://34.71.107.222
-ENV DATABASE_URL=postgresql://postgres:admin123@34.71.107.222:5433/numadb?schema=public&connection_limit=20&pool_timeout=5
-ENV PORT=3000
+ARG FRONTEND_URL
+ENV FRONTEND_URL=$FRONTEND_URL
+
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
+ARG JWT_SECRET
+ENV JWT_SECRET=$JWT_SECRET
+
+ARG PORT
+ENV PORT=$PORT
 
 EXPOSE 3000
 

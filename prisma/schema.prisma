@@ -104,3 +104,13 @@ model financiamiento {
   fecha_pago_div         DateTime?  @db.Date
   contratos              contratos? @relation(fields: [id_contrato], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "financiamiento_id_contrato_contratos_id_fk")
 }
+
+model usuarios {
+  id        String     @id @default(uuid())
+  nombre    String     @db.VarChar(255)
+  apellido  String     @db.VarChar(255)
+  email     String     @unique @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  activo    Boolean    @default(true)
+  roles     String[]   @default(["user"])
+}

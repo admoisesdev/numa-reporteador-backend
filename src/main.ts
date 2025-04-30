@@ -22,6 +22,7 @@ async function bootstrap() {
       process.env.FRONTEND_URL,
       'http://localhost:5173',
       'http://localhost',
+      'https://reporteador-numa.netlify.app',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
