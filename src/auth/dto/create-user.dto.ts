@@ -7,7 +7,7 @@ import {
   MinLength,
 } from 'class-validator';
 
-import { REGEX } from 'src/common/constants';
+import { REGEX } from 'src/common';
 
 export class CreateUserDto {
   @ApiProperty()

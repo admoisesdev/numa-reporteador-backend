@@ -7,13 +7,11 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { PrismaService } from 'src/common';
+import { PrismaService, BcryptAdapter } from 'src/common';
 
 import { CreateUserDto, LoginUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { usuarios as User } from '@prisma/client';
-
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +42,7 @@ export class AuthService {
     try {
       const { password, ...userData } = createUserDto;
 
-      const hashedPassword = bcrypt.hashSync(password, 10);
+      const hashedPassword = BcryptAdapter.hash(password);
 
       const user = await this.prisma.usuarios.create({
         data: {
@@ -76,7 +74,7 @@ export class AuthService {
       throw new UnauthorizedException('Credentials are not valid (email)');
     }
 
-    const isPasswordValid = bcrypt.compareSync(password, hashedPassword);
+    const isPasswordValid = BcryptAdapter.compare(password, hashedPassword);
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Credentials are not valid (password)');
