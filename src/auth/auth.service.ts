@@ -39,17 +39,24 @@ export class AuthService {
   }
 
   async create(createUserDto: CreateUserDto) {
-    try {
-      const { password, ...userData } = createUserDto;
+    const { password, ...userData } = createUserDto;
 
+    const existingUser = await this.prisma.usuarios.findUnique({
+      where: { email: userData.email },
+    });
+    if (existingUser) {
+      throw new BadRequestException('El email ya está registrado.');
+    }
+
+    try {
       const hashedPassword = BcryptAdapter.hash(password);
 
       const user = await this.prisma.usuarios.create({
         data: {
+          nombre: userData.name,
+          apellido: userData.lastName,
           email: userData.email.toLocaleLowerCase(),
           password: hashedPassword,
-          apellido: userData.lastName,
-          nombre: userData.name,
         },
       });
 
@@ -67,17 +74,20 @@ export class AuthService {
     const response = await this.prisma.usuarios.findUnique({
       where: { email },
     });
+    if (!response) {
+      throw new UnauthorizedException(
+        'Email no encontrado. Verifique su email.',
+      );
+    }
 
     const { password: hashedPassword, ...user } = response;
-
-    if (!user) {
-      throw new UnauthorizedException('Credentials are not valid (email)');
-    }
 
     const isPasswordValid = BcryptAdapter.compare(password, hashedPassword);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credentials are not valid (password)');
+      throw new UnauthorizedException(
+        'Password no valido. Verifique su password.',
+      );
     }
 
     return {

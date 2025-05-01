@@ -31,7 +31,7 @@ export class CreateUserDto {
   @MaxLength(50)
   @Matches(REGEX.password, {
     message:
-      'The password must have a Uppercase, lowercase letter and a number',
+      'El password debe tener al menos un número, una letra mayúscula, una letra minúscula y un símbolo.',
   })
   password: string;
 }
