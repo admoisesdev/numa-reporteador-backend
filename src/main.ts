@@ -30,7 +30,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: FRONTEND_ORIGINS,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
 
