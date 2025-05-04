@@ -16,13 +16,17 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GCP_SSH_KEY }}
 
-      - name: Sync and Update Backend
+      - name: Sync Files
         run: |
           rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no" \
+            -e "ssh -o StrictHostKeyChecking=no -o BatchMode=yes" \
             --exclude='.git' \
             --exclude='node_modules' \
-            ./ numa-desarrollo@34.71.107.222:/numa-reporteador-backend
+            ./ numa-desarrollo@34.71.107.222:/home/numa-desarrollo/numa-reporteador-backend
 
-          ssh -o StrictHostKeyChecking=no numa-desarrollo@34.71.107.222 \
-            "cd /numa-reporteador-backend && ./update-service.sh backend"
+      - name: Update Service
+        run: |
+          ssh -o StrictHostKeyChecking=no -o BatchMode=yes numa-desarrollo@34.71.107.222 \
+            "cd /home/numa-desarrollo/numa-reporteador-backend && \
+            chmod +x update-service.sh && \
+            ./update-service.sh backend"
