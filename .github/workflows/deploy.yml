@@ -27,6 +27,6 @@ jobs:
       - name: Update Service
         run: |
           ssh -o StrictHostKeyChecking=no -o BatchMode=yes numa-desarrollo@34.71.107.222 \
-            "cd /home/numa-desarrollo/numa-reporteador-backend && \
+            "cd /home/numa-desarrollo && \
             chmod +x update-service.sh && \
             ./update-service.sh backend"
