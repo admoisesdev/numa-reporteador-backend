@@ -22,7 +22,7 @@ jobs:
             -e "ssh -o StrictHostKeyChecking=no" \
             --exclude='.git' \
             --exclude='node_modules' \
-            ./ numa-desarrolo@34.71.107.222:/numa-reporteador-backend
+            ./ numa-desarrollo@34.71.107.222:/numa-reporteador-backend
 
-          ssh -o StrictHostKeyChecking=no numa-desarrolo@34.71.107.222 \
+          ssh -o StrictHostKeyChecking=no numa-desarrollo@34.71.107.222 \
             "cd /numa-reporteador-backend && ./update-service.sh backend"
