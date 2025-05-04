@@ -18,7 +18,7 @@ export class AuthService {
   private readonly logger = new Logger('AuthService');
 
   constructor(
-    private readonly prisma: PrismaService = new PrismaService(),
+    private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
   ) {}
 

@@ -11,7 +11,7 @@ import { usuarios as User } from '@prisma/client';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private readonly prisma: PrismaService = new PrismaService(),
+    private readonly prisma: PrismaService,
     configService: ConfigService,
   ) {
     super({

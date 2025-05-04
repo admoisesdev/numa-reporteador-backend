@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
@@ -16,10 +17,11 @@ interface GetContractsCustomerUseCase {
   execute(params?: ContractsCustomerParams): Promise<Contract[]>;
 }
 
+@Injectable()
 export class GetContractsCustomer implements GetContractsCustomerUseCase {
   private readonly logger = new Logger('GetContractsCustomer');
 
-  constructor(private prisma: PrismaService = new PrismaService()) {}
+  constructor(private prisma: PrismaService) {}
 
   private handleExceptions(error: any) {
     if (error.code === '23505') {

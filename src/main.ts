@@ -3,10 +3,21 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
+import { PrismaService } from './common';
+
+const FRONTEND_ORIGINS = [
+  process.env.FRONTEND_URL,
+  'http://localhost:5173',
+  'http://localhost',
+  'https://reporteador-numa.netlify.app',
+].filter(Boolean);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
+
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app);
 
   app.setGlobalPrefix('api');
 
@@ -18,12 +29,7 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: [
-      process.env.FRONTEND_URL,
-      'http://localhost:5173',
-      'http://localhost',
-      'https://reporteador-numa.netlify.app',
-    ],
+    origin: FRONTEND_ORIGINS,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });

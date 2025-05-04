@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
@@ -13,10 +14,11 @@ interface GetPortfolioAgeUseCase {
   execute(params?: PortfolioAgeParams);
 }
 
+@Injectable()
 export class GetPortfolioAge implements GetPortfolioAgeUseCase {
   private readonly logger = new Logger('GetPortfolioAge');
 
-  constructor(private readonly prisma: PrismaService = new PrismaService()) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private handleExceptions(error: any) {
     if (error.code === '23505') {

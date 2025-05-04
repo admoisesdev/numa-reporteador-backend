@@ -106,11 +106,34 @@ model financiamiento {
 }
 
 model usuarios {
-  id        String     @id @default(uuid())
-  nombre    String     @db.VarChar(255)
-  apellido  String     @db.VarChar(255)
-  email     String     @unique @db.VarChar(255)
-  password  String     @db.VarChar(255)
-  activo    Boolean    @default(true)
-  roles     String[]   @default(["user"])
+  id              String            @id @default(uuid())
+  nombre          String            @db.VarChar(255)
+  apellido        String            @db.VarChar(255)
+  email           String            @unique @db.VarChar(255)
+  password        String            @db.VarChar(255)
+  activo          Boolean           @default(true)
+  roles           String[]          @default(["user"])
+  usuario_empresa usuario_empresa[]
+}
+
+model empresas {
+  id                  Int               @id @default(autoincrement())
+  ruc                 Decimal           @db.Decimal(20, 0)
+  razon_social        String            @db.VarChar(255)
+  proyecto            String?           @db.VarChar(255)
+  comercial           String?           @db.VarChar(255)
+  establecimiento     String?           @db.VarChar(20)
+  representante_legal String?           @db.VarChar(255)
+  fecha               DateTime?         @db.Date
+  estado              Boolean?          @default(true)
+  usuario_empresa     usuario_empresa[]
+}
+
+model usuario_empresa {
+  usuario_id String
+  empresa_id Int
+  empresas   empresas @relation(fields: [empresa_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  usuarios   usuarios @relation(fields: [usuario_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([usuario_id, empresa_id])
 }

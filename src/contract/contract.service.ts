@@ -11,37 +11,36 @@ import {
 
 @Injectable()
 export class ContractService {
-  async getContractsByCustomer(customerId: number): Promise<Contract[]> {
-    const contractsByCustomer = new GetContractsCustomer();
+  constructor(
+    private contractsByCustomer: GetContractsCustomer,
+    private contractAccountStatus: GetContractAccountStatus,
+    private chargedPortfolio: GetChargedPortfolio,
+    private portfolioAge: GetPortfolioAge,
+    private receivables: GetReceivables,
+  ) {}
 
-    return await contractsByCustomer.execute({
+  async getContractsByCustomer(customerId: number): Promise<Contract[]> {
+    return this.contractsByCustomer.execute({
       customerId,
     });
   }
 
   async getAccountStatus(contractId: string) {
-    const contractAccountStatus = new GetContractAccountStatus();
-
-    return await contractAccountStatus.execute({ contractId });
+    return this.contractAccountStatus.execute({ contractId });
   }
 
   async getChargedPortfolio(rangeStartDate: string, rangeEndDate: string) {
-    const chargedPortfolio = new GetChargedPortfolio();
-
-    return await chargedPortfolio.execute({
+    return this.chargedPortfolio.execute({
       rangeStartDate,
       rangeEndDate,
     });
   }
 
   async getReceivables(expirationDate: string) {
-    const receivables = new GetReceivables();
-    return await receivables.execute({ expirationDate });
+    return this.receivables.execute({ expirationDate });
   }
 
   async getPortfolioAge(expirationDate: string) {
-    const portfolioAge = new GetPortfolioAge();
-
-    return await portfolioAge.execute({ expirationDate });
+    return this.portfolioAge.execute({ expirationDate });
   }
 }

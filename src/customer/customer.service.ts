@@ -5,10 +5,10 @@ import { GetCustomers } from './use-cases';
 
 @Injectable()
 export class CustomerService {
-  async getCustomers(isActive: boolean): Promise<Customer[]> {
-    const customers = new GetCustomers();
+  constructor(private customers: GetCustomers) {}
 
-    return await customers.execute({
+  async getCustomers(isActive: boolean): Promise<Customer[]> {
+    return this.customers.execute({
       active: isActive,
     });
   }

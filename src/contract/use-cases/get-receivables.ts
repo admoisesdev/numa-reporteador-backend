@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Injectable,
   InternalServerErrorException,
   Logger,
 } from '@nestjs/common';
@@ -13,10 +14,11 @@ interface GetReceivablesUseCase {
   execute(params?: ReceivablesParams);
 }
 
+@Injectable()
 export class GetReceivables implements GetReceivablesUseCase {
   private readonly logger = new Logger('GetReceivables');
 
-  constructor(private readonly prisma: PrismaService = new PrismaService()) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   private handleExceptions(error: any) {
     if (error.code === '23505') {
