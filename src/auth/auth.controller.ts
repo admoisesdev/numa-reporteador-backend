@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
-import { CreateUserDto, LoginUserDto } from './dto';
+import { CreateAuthUserDto, LoginUserDto } from './dto';
 import { Auth, GetUser } from './decorators';
 
 import { usuarios as User } from '@prisma/client';
@@ -13,8 +13,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.authService.create(createUserDto);
+  register(@Body() createUserDto: CreateAuthUserDto) {
+    return this.authService.register(createUserDto);
   }
 
   @Post('login')

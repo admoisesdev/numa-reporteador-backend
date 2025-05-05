@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { PrismaService, BcryptAdapter } from 'src/common';
 
-import { CreateUserDto, LoginUserDto } from './dto';
+import { CreateAuthUserDto, LoginUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { usuarios as User } from '@prisma/client';
 
@@ -38,7 +38,7 @@ export class AuthService {
     return token;
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateAuthUserDto) {
     const { password, ...userData } = createUserDto;
 
     const existingUser = await this.prisma.usuarios.findUnique({

@@ -9,7 +9,7 @@ import {
 
 import { REGEX } from 'src/common';
 
-export class CreateUserDto {
+export class CreateAuthUserDto {
   @ApiProperty()
   @IsString()
   @MinLength(1)
