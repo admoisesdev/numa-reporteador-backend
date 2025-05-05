@@ -10,6 +10,7 @@ import { Reflector } from '@nestjs/core';
 import { META_ROLES } from '../decorators';
 
 import { Observable } from 'rxjs';
+import { usuarios as User } from '@prisma/client';
 
 @Injectable()
 export class UserRoleGuard implements CanActivate {
@@ -25,13 +26,13 @@ export class UserRoleGuard implements CanActivate {
     if (!validRoles || validRoles.length === 0) return true;
 
     const req = context.switchToHttp().getRequest();
-    const user = req.user;
+    const user = req.user as User;
     if (!user) throw new BadRequestException('User not found');
 
     const hasRole = validRoles.some((role) => user.roles?.includes(role));
     if (!hasRole) {
       throw new ForbiddenException(
-        `User ${user.fullName} need a valid role: ${validRoles}`,
+        `User ${user.nombre} ${user.apellido} need a valid role: ${validRoles}`,
       );
     }
 

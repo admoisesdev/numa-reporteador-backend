@@ -1,8 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
-  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { contratos as Contract } from '@prisma/client';
@@ -19,19 +17,7 @@ interface GetContractsCustomerUseCase {
 
 @Injectable()
 export class GetContractsCustomer implements GetContractsCustomerUseCase {
-  private readonly logger = new Logger('GetContractsCustomer');
-
   constructor(private prisma: PrismaService) {}
-
-  private handleExceptions(error: any) {
-    if (error.code === '23505') {
-      throw new BadRequestException(error.detail);
-    }
-    this.logger.error(error);
-    throw new InternalServerErrorException(
-      'Unexpected error, check server logs',
-    );
-  }
 
   public async execute(params?: ContractsCustomerParams): Promise<Contract[]> {
     const { customerId } = params;
@@ -40,22 +26,16 @@ export class GetContractsCustomer implements GetContractsCustomerUseCase {
       throw new BadRequestException('Customer ID is required');
     }
 
-    try {
-      const contractsByCustomer = await this.prisma.contratos.findMany({
-        where: {
-          cliente_id: customerId,
-        },
-      });
+    const contractsByCustomer = await this.prisma.contratos.findMany({
+      where: {
+        cliente_id: customerId,
+      },
+    });
 
-      if (!contractsByCustomer || contractsByCustomer.length === 0) {
-        throw new NotFoundException(
-          'No contracts found for the given customer',
-        );
-      }
-
-      return contractsByCustomer;
-    } catch (error) {
-      this.handleExceptions(error);
+    if (!contractsByCustomer || contractsByCustomer.length === 0) {
+      throw new NotFoundException('No contracts found for the given customer');
     }
+
+    return contractsByCustomer;
   }
 }

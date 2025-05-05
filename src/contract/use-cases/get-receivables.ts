@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common';
 
 type ReceivablesParams = {
@@ -16,19 +11,7 @@ interface GetReceivablesUseCase {
 
 @Injectable()
 export class GetReceivables implements GetReceivablesUseCase {
-  private readonly logger = new Logger('GetReceivables');
-
   constructor(private readonly prisma: PrismaService) {}
-
-  private handleExceptions(error: any) {
-    if (error.code === '23505') {
-      throw new BadRequestException(error.detail);
-    }
-    this.logger.error(error);
-    throw new InternalServerErrorException(
-      'Unexpected error, check server logs',
-    );
-  }
 
   public async execute(params: ReceivablesParams) {
     const { expirationDate: expirationDateParam } = params;
@@ -44,8 +27,7 @@ export class GetReceivables implements GetReceivablesUseCase {
       throw new BadRequestException("Invalid 'expirationDate' format");
     }
 
-    try {
-      const receivablesContracts = await this.prisma.$queryRaw`
+    const receivablesContracts = await this.prisma.$queryRaw`
         SELECT 
         c.empresa,
         c.proyecto,
@@ -74,9 +56,6 @@ export class GetReceivables implements GetReceivablesUseCase {
         ORDER by contrato, f.fecha_vencimiento
       `;
 
-      return receivablesContracts;
-    } catch (error) {
-      this.handleExceptions(error);
-    }
+    return receivablesContracts;
   }
 }

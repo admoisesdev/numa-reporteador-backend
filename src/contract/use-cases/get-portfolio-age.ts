@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common';
 
 type PortfolioAgeParams = {
@@ -16,19 +11,7 @@ interface GetPortfolioAgeUseCase {
 
 @Injectable()
 export class GetPortfolioAge implements GetPortfolioAgeUseCase {
-  private readonly logger = new Logger('GetPortfolioAge');
-
   constructor(private readonly prisma: PrismaService) {}
-
-  private handleExceptions(error: any) {
-    if (error.code === '23505') {
-      throw new BadRequestException(error.detail);
-    }
-    this.logger.error(error);
-    throw new InternalServerErrorException(
-      'Unexpected error, check server logs',
-    );
-  }
 
   public async execute(params: PortfolioAgeParams) {
     const { expirationDate: expirationDateParam } = params;
@@ -44,8 +27,7 @@ export class GetPortfolioAge implements GetPortfolioAgeUseCase {
       throw new BadRequestException("Invalid 'expirationDate' format");
     }
 
-    try {
-      const portfolioAgeContracts = await this.prisma.$queryRaw`
+    const portfolioAgeContracts = await this.prisma.$queryRaw`
         SELECT
         proyecto,
         contrato,
@@ -113,9 +95,6 @@ export class GetPortfolioAge implements GetPortfolioAgeUseCase {
         )
       `;
 
-      return portfolioAgeContracts;
-    } catch (error) {
-      this.handleExceptions(error);
-    }
+    return portfolioAgeContracts;
   }
 }

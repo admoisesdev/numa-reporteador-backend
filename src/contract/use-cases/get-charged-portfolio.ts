@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/common';
 
 type ChargedPortfolioParams = {
@@ -17,19 +12,7 @@ interface GetChargedPortfolioUseCase {
 
 @Injectable()
 export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
-  private readonly logger = new Logger('GetChargedPortfolio');
-
   constructor(private readonly prisma: PrismaService) {}
-
-  private handleExceptions(error: any) {
-    if (error.code === '23505') {
-      throw new BadRequestException(error.detail);
-    }
-    this.logger.error(error);
-    throw new InternalServerErrorException(
-      'Unexpected error, check server logs',
-    );
-  }
 
   public async execute(params: ChargedPortfolioParams) {
     const { rangeStartDate, rangeEndDate } = params;
@@ -50,8 +33,7 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
       throw new BadRequestException("Invalid 'rangeEndDate' format");
     }
 
-    try {
-      const chargedPortfolioContracts = await this.prisma.$queryRaw`
+    const chargedPortfolioContracts = await this.prisma.$queryRaw`
         SELECT 
         proyecto,
         contrato,
@@ -140,9 +122,6 @@ export class GetChargedPortfolio implements GetChargedPortfolioUseCase {
         )
       `;
 
-      return chargedPortfolioContracts;
-    } catch (error) {
-      this.handleExceptions(error);
-    }
+    return chargedPortfolioContracts;
   }
 }

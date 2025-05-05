@@ -36,8 +36,21 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Numa API Rest')
-    .setDescription('Numa endpoints reportes, clientes, contratos, etc...')
+    .setDescription(
+      'Numa endpoints reportes, clientes, contratos,empresas, etc...',
+    )
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        description: 'Ingresa el token de acceso',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
 
   const documentFactory = () => SwaggerModule.createDocument(app, config);

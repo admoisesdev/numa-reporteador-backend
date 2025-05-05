@@ -1,5 +1,5 @@
 import { Controller, Post, Body, Get } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { CreateUserDto, LoginUserDto } from './dto';
@@ -22,6 +22,7 @@ export class AuthController {
     return this.authService.login(createUserDto);
   }
 
+  @ApiBearerAuth('access-token')
   @Get('ckeck-auth-status')
   @Auth()
   checkAuthStatus(@GetUser() user: User) {

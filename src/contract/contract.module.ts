@@ -10,10 +10,12 @@ import {
   GetPortfolioAge,
   GetReceivables,
 } from './use-cases';
+
 import { CommonModule } from 'src/common/common.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [CommonModule],
+  imports: [CommonModule, AuthModule],
   controllers: [ContractController],
   providers: [
     ContractService,
