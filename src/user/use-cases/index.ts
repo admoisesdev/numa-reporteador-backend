@@ -1,2 +1,2 @@
-export * from './create-user.use-case';
-export * from './get-users-companies.use-case';
+export * from './create-user';
+export * from './get-users-companies';
