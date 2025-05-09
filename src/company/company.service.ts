@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { empresas as Company } from '@prisma/client';
 
-import { CreateCompany, GetCompaniesByUser } from './use-cases';
+import { CreateCompany, GetCompanies, GetCompaniesByUser } from './use-cases';
 import { CreateCompanyDto } from './dto';
 
 @Injectable()
@@ -14,8 +14,9 @@ export class CompanyService {
   private readonly logger = new Logger('CompanyService');
 
   constructor(
-    private companiesByUser: GetCompaniesByUser,
     private createCompany: CreateCompany,
+    private getCompanies: GetCompanies,
+    private companiesByUser: GetCompaniesByUser,
   ) {}
 
   private handleExceptions(error: any) {
@@ -34,6 +35,16 @@ export class CompanyService {
       const newCompany = await this.createCompany.execute(createCompanyDto);
 
       return newCompany;
+    } catch (error) {
+      this.handleExceptions(error);
+    }
+  }
+
+  async findAll(): Promise<Company[]> {
+    try {
+      const companies = await this.getCompanies.execute();
+
+      return companies;
     } catch (error) {
       this.handleExceptions(error);
     }

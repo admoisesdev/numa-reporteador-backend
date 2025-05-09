@@ -20,6 +20,12 @@ export class CompanyController {
     return this.companyService.create(createCompanyDto);
   }
 
+  @Get()
+  @Auth(ValidRoles.ADMIN)
+  findAll() {
+    return this.companyService.findAll();
+  }
+
   @Get('companies/user')
   @Auth()
   findAllByUser(@GetUser() user: User) {

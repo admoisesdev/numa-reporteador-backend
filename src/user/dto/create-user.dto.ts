@@ -17,6 +17,7 @@ export class CreateUserDto extends CreateAuthUserDto {
   roles?: string[];
 
   @ApiProperty({ type: [Number], example: [1, 2, 3] })
+  @IsOptional()
   @IsArray()
   companyIds: number[];
 }

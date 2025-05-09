@@ -22,7 +22,7 @@ export class CreateUser implements CreateUserUseCase {
       where: { email: email },
     });
     if (existingUser) {
-      throw new BadRequestException('Email already registered');
+      throw new BadRequestException('Email ya registrado');
     }
 
     const companies = await this.prisma.empresas.findMany({
