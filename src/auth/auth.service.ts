@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { PrismaService, BcryptAdapter } from 'src/common';
 
-import { CreateAuthUserDto, LoginUserDto } from './dto';
+import { ChangePasswordDto, CreateAuthUserDto, LoginUserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload';
 import { usuarios as User } from '@prisma/client';
 
@@ -103,5 +103,33 @@ export class AuthService {
       ...user,
       token: this.getJwtToken({ id: user.id }),
     };
+  }
+
+  async changePassword(email: string, body: ChangePasswordDto) {
+    const { newPassword } = body;
+
+    const user = await this.prisma.usuarios.findUnique({
+      where: { email },
+    });
+    if (!user) {
+      throw new UnauthorizedException(
+        'Email no encontrado. Verifique su email.',
+      );
+    }
+
+    const hashedPassword = BcryptAdapter.hash(newPassword);
+
+    try {
+      const user = await this.prisma.usuarios.update({
+        where: { email },
+        data: { password: hashedPassword },
+      });
+
+      delete user.password;
+
+      return user;
+    } catch (error) {
+      this.handleDBExceptions(error);
+    }
   }
 }
